@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Reactor</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="p5-background"></div>
+    <div class="container">
+        <header class="glass-header">
+            <div class="logo">
+                <h1>VOICE<span>REACTOR</span></h1>
+                <p class="subtitle-text">Transform your text into natural speech with artificial intelligence</p>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="text">Enter your text</label>
+                    <textarea id="text" placeholder="Write or paste your text here... (max 2500 characters)" maxlength="2500"></textarea>
+                    <div class="char-counter">
+                        <span id="char-count">0</span>/2500 characters
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="voice">Voice selection</label>
+                    <div class="style-selector" id="voice-selector">
+                        <div class="style-selector-header">
+                            Rachel (Female)
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="style-selector-dropdown">
+                            {% for voice_key, voice_data in voices.items() %}
+                            <div class="style-option {% if loop.first %}active{% endif %}" data-value="{{ voice_key }}">
+                                {{ voice_data.name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" id="voice" value="rachel">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="stability">Voice stability</label>
+                    <div class="slider-container">
+                        <input type="range" id="stability" min="0" max="100" value="50">
+                        <span id="stability-value">50</span>%
+                    </div>
+                    <small>Higher values = more consistent, lower values = more expressive</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="similarity">Voice similarity</label>
+                    <div class="slider-container">
+                        <input type="range" id="similarity" min="0" max="100" value="50">
+                        <span id="similarity-value">50</span>%
+                    </div>
+                    <small>Higher values = closer to original voice</small>
+                </div>
+
+                <button id="generate-btn" class="generate-btn">
+                    <span class="btn-text">Generate Speech</span>
+                    <span class="loading-spinner hidden">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+            </div>
+
+            <div class="output-section">
+                <div class="audio-container">
+                    <div class="placeholder">
+                        <i class="fas fa-microphone"></i>
+                        <p>Your audio will appear here</p>
+                        <p class="small-text">Enter text and click generate to create speech</p>
+                    </div>
+                    <div id="audio-player" class="hidden">
+                        <audio id="generated-audio" controls>
+                            <source src="" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="audio-info">
+                            <p><strong>Voice:</strong> <span id="voice-info">-</span></p>
+                            <p><strong>Text length:</strong> <span id="text-length">-</span> characters</p>
+                        </div>
+                    </div>
+                </div>
+                <button id="download-btn" class="download-btn hidden">
+                    <i class="fas fa-download"></i> Download Audio
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="{{ url_for('static', filename='ai-background.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
