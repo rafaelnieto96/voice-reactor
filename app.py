@@ -52,9 +52,8 @@ def generate_audio():
 
         text = data.get('text', '').strip()
         voice_id = data.get('voice', 'rachel').strip()
-        stability = data.get('stability', 0.5)
-        similarity_boost = data.get('similarity_boost', 0.5)
         speed = data.get('speed', 1.0)
+        clarity = data.get('clarity', 0.75)
 
         # Validate input values
         if not text:
@@ -68,17 +67,14 @@ def generate_audio():
 
         # Validate numerical values
         try:
-            stability = float(stability)
-            similarity_boost = float(similarity_boost)
             speed = float(speed)
+            clarity = float(clarity)
             
-            stability = max(0.0, min(1.0, stability))
-            similarity_boost = max(0.0, min(1.0, similarity_boost))
             speed = max(0.25, min(2.0, speed))
+            clarity = max(0.0, min(1.0, clarity))
         except (ValueError, TypeError):
-            stability = 0.5
-            similarity_boost = 0.5
             speed = 1.0
+            clarity = 0.75
 
         # Get voice ID
         selected_voice_id = AVAILABLE_VOICES[voice_id]['id']
@@ -92,13 +88,15 @@ def generate_audio():
             "xi-api-key": ELEVENLABS_API_KEY
         }
         
+        # Convertir clarity a stability (más clarity = más stability)
+        # Convertir speed manteniendo el rango de ElevenLabs
         payload = {
             "text": text,
             "model_id": "eleven_monolingual_v1",
             "voice_settings": {
-                "stability": stability,
-                "similarity_boost": similarity_boost,
-                "style": 0.0,
+                "stability": clarity,  # Clarity se mapea a stability
+                "similarity_boost": 0.7,  # Valor fijo bueno
+                "style": 0.2,  # Un poco de estilo
                 "use_speaker_boost": True
             }
         }

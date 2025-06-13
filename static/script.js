@@ -1,18 +1,23 @@
 document.addEventListener('DOMContentLoaded', function () {
     const textInput = document.getElementById('text');
     const voiceInput = document.getElementById('voice');
-    const voiceSelectorHeader = document.querySelector('#voice-selector .style-selector-header');
-    const voiceOptions = document.querySelectorAll('#voice-selector .style-option');
-    const stabilitySlider = document.getElementById('stability');
-    const stabilityValue = document.getElementById('stability-value');
-    const similaritySlider = document.getElementById('similarity');
-    const similarityValue = document.getElementById('similarity-value');
+    const voiceSelector = document.getElementById('voice-selector');
+    const selectTrigger = voiceSelector.querySelector('.select-trigger');
+    const selectOptions = voiceSelector.querySelector('.select-options');
+    const selectedOption = voiceSelector.querySelector('.selected-option');
+    const options = voiceSelector.querySelectorAll('.option');
+    
+    const speedSlider = document.getElementById('speed');
+    const speedValue = document.getElementById('speed-value');
+    const claritySlider = document.getElementById('clarity');
+    const clarityValue = document.getElementById('clarity-value');
+    
     const generateBtn = document.getElementById('generate-btn');
     const downloadBtn = document.getElementById('download-btn');
     const generatedAudio = document.getElementById('generated-audio');
     const audioPlayer = document.getElementById('audio-player');
-    const placeholder = document.querySelector('.placeholder');
-    const loadingSpinner = document.querySelector('.loading-spinner');
+    const audioPlaceholder = document.getElementById('audio-placeholder');
+    
     const charCount = document.getElementById('char-count');
     const voiceInfo = document.getElementById('voice-info');
     const textLength = document.getElementById('text-length');
@@ -25,99 +30,131 @@ document.addEventListener('DOMContentLoaded', function () {
         charCount.textContent = length;
         
         if (length > 2500) {
-            charCount.style.color = 'var(--alert-color)';
+            charCount.style.color = '#ff5e5e';
         } else if (length > 2000) {
-            charCount.style.color = '#ffaa00';
+            charCount.style.color = '#f4b942';
         } else {
-            charCount.style.color = 'var(--accent-color)';
+            charCount.style.color = '#f4b942';
         }
     });
 
-    // Voice selector functionality
-    voiceSelectorHeader.addEventListener('click', function () {
+    // Custom select functionality
+    selectTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
         this.classList.toggle('open');
-        this.nextElementSibling.classList.toggle('open');
+        selectOptions.classList.toggle('open');
     });
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function (event) {
-        const voiceSelector = event.target.closest('#voice-selector');
-        if (!voiceSelector) {
-            voiceSelectorHeader.classList.remove('open');
-            voiceSelectorHeader.nextElementSibling.classList.remove('open');
-        }
+    // Close select when clicking outside
+    document.addEventListener('click', function() {
+        selectTrigger.classList.remove('open');
+        selectOptions.classList.remove('open');
     });
 
-    // Handle voice selection
-    voiceOptions.forEach(option => {
-        option.addEventListener('click', function () {
-            // Update active class
-            voiceOptions.forEach(opt => opt.classList.remove('active'));
-            this.classList.add('active');
-
-            // Update header text and hidden input
-            const selectedText = this.textContent;
-            const selectedValue = this.getAttribute('data-value');
-
-            // Update header content
-            voiceSelectorHeader.innerHTML = selectedText + '<span class="icon">▼</span>';
-
-            // Update hidden input value
-            voiceInput.value = selectedValue;
-
+    // Handle option selection
+    options.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove previous selection
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Select current option
+            this.classList.add('selected');
+            
+            // Update display and hidden input
+            const value = this.getAttribute('data-value');
+            const text = this.textContent.trim();
+            
+            selectedOption.textContent = text;
+            voiceInput.value = value;
+            
             // Close dropdown
-            this.parentElement.classList.remove('open');
-            voiceSelectorHeader.classList.remove('open');
+            selectTrigger.classList.remove('open');
+            selectOptions.classList.remove('open');
         });
     });
 
     // Update slider values
-    stabilitySlider.addEventListener('input', function () {
-        stabilityValue.textContent = this.value;
+    speedSlider.addEventListener('input', function () {
+        speedValue.textContent = this.value;
     });
 
-    similaritySlider.addEventListener('input', function () {
-        similarityValue.textContent = this.value;
+    claritySlider.addEventListener('input', function () {
+        clarityValue.textContent = this.value;
     });
 
-    // Functions to handle loading state
+    // Loading state management
     function setLoadingState(isLoading) {
+        const btnText = generateBtn.querySelector('.btn-text');
+        const loadingDots = generateBtn.querySelector('.loading-dots');
+        
         generateBtn.disabled = isLoading;
+        
         if (isLoading) {
-            loadingSpinner.classList.remove('hidden');
-            generateBtn.classList.add('disabled');
-            placeholder.innerHTML = `
-                <i class="fas fa-cog fa-spin"></i>
-                <p>Generating your audio, please wait...</p>
-                <p class="small-text">(This may take 10-15 seconds)</p>
+            btnText.classList.add('hidden');
+            loadingDots.classList.remove('hidden');
+            
+            audioPlaceholder.classList.add('loading');
+            audioPlaceholder.innerHTML = `
+                <div class="sound-waves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+                <p>Generating your audio...</p>
+                <small>This may take 10-15 seconds</small>
             `;
-            placeholder.classList.add('loading');
-            placeholder.classList.remove('hidden');
+            
             audioPlayer.classList.add('hidden');
             downloadBtn.classList.add('hidden');
         } else {
-            loadingSpinner.classList.add('hidden');
-            generateBtn.classList.remove('disabled');
-            placeholder.classList.remove('loading');
+            btnText.classList.remove('hidden');
+            loadingDots.classList.add('hidden');
+            audioPlaceholder.classList.remove('loading');
         }
     }
 
     function handleError(errorMessage) {
         console.error("Error:", errorMessage);
-        placeholder.innerHTML = `
-            <i class="fas fa-exclamation-triangle"></i>
+        
+        audioPlaceholder.classList.add('error');
+        audioPlaceholder.innerHTML = `
+            <div class="sound-waves">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
             <p>Error: ${errorMessage}</p>
+            <small>Please try again</small>
         `;
-        placeholder.classList.add('error');
-        placeholder.classList.remove('hidden');
+        
         audioPlayer.classList.add('hidden');
         downloadBtn.classList.add('hidden');
         setLoadingState(false);
     }
 
+    function resetPlaceholder() {
+        audioPlaceholder.classList.remove('loading', 'error');
+        audioPlaceholder.innerHTML = `
+            <div class="sound-waves">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <p>Your audio will appear here</p>
+            <small>Enter text and generate to create speech</small>
+        `;
+    }
+
     // Generate audio
     generateBtn.addEventListener('click', async function () {
         const text = textInput.value.trim();
+        
         if (!text) {
             handleError('Please enter some text to convert to speech');
             return;
@@ -128,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Set loading state
         setLoadingState(true);
 
         try {
@@ -140,8 +176,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify({
                     text: text,
                     voice: voiceInput.value,
-                    stability: parseFloat(stabilitySlider.value) / 100,
-                    similarity_boost: parseFloat(similaritySlider.value) / 100
+                    speed: parseFloat(speedSlider.value) / 100,
+                    clarity: parseFloat(claritySlider.value) / 100
                 })
             });
 
@@ -157,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 textLength.textContent = text.length;
                 
                 // Show audio player
-                placeholder.classList.add('hidden');
+                audioPlaceholder.classList.add('hidden');
                 audioPlayer.classList.remove('hidden');
                 downloadBtn.classList.remove('hidden');
                 setLoadingState(false);
@@ -204,5 +240,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             alert('Failed to download audio: ' + error.message);
         }
+    });
+
+    // Reset placeholder when audio ends
+    generatedAudio.addEventListener('ended', function() {
+        // Optional: Could reset to placeholder after audio ends
     });
 });
