@@ -88,15 +88,13 @@ def generate_audio():
             "xi-api-key": ELEVENLABS_API_KEY
         }
         
-        # Convertir clarity a stability (más clarity = más stability)
-        # Convertir speed manteniendo el rango de ElevenLabs
         payload = {
             "text": text,
             "model_id": "eleven_monolingual_v1",
             "voice_settings": {
-                "stability": clarity,  # Clarity se mapea a stability
-                "similarity_boost": 0.7,  # Valor fijo bueno
-                "style": 0.2,  # Un poco de estilo
+                "stability": clarity,
+                "similarity_boost": 0.7,
+                "style": 0.2,
                 "use_speaker_boost": True
             }
         }
@@ -116,24 +114,20 @@ def generate_audio():
             })
         else:
             logger.error(f"ElevenLabs API error: {response.status_code} - {response.text}")
-            
-            if response.status_code == 401:
-                return jsonify({'error': 'API key is invalid'}), 500
-            elif response.status_code == 429:
-                return jsonify({'error': 'Rate limit exceeded. Please try again later'}), 429
-            else:
-                return jsonify({'error': 'Failed to generate audio. Please try again'}), 500
+            return jsonify({'error': 'Unable to generate audio at this time. Please try again in a few moments'}), 500
 
     except requests.exceptions.Timeout:
         logger.error("Request timeout")
-        return jsonify({'error': 'Request timed out. Please try again'}), 500
+        return jsonify({'error': 'Unable to generate audio at this time. Please try again in a few moments'}), 500
+        
     except requests.exceptions.RequestException as e:
         logger.error(f"Request error: {str(e)}")
-        return jsonify({'error': 'Network error. Please check your connection'}), 500
+        return jsonify({'error': 'Unable to generate audio at this time. Please try again in a few moments'}), 500
+        
     except Exception as e:
         logger.error(f"Audio generation failed: {str(e)}")
         traceback.print_exc()
-        return jsonify({'error': 'Unable to generate audio at this time. Please try again later'}), 500
+        return jsonify({'error': 'Unable to generate audio at this time. Please try again in a few moments'}), 500
 
 @app.route('/download', methods=['POST'])
 def download_audio():
@@ -142,7 +136,7 @@ def download_audio():
         audio_data = data.get('audio_data', '')
         
         if not audio_data or not audio_data.startswith('data:audio/mpeg;base64,'):
-            return jsonify({'error': 'Invalid audio data'}), 400
+            return jsonify({'error': 'Unable to download audio. Please try generating new audio'}), 400
         
         # Extract base64 data
         base64_data = audio_data.split(',')[1]
@@ -162,7 +156,7 @@ def download_audio():
         
     except Exception as e:
         logger.error(f"Download failed: {str(e)}")
-        return jsonify({'error': 'Failed to download audio'}), 500
+        return jsonify({'error': 'Unable to download audio. Please try again'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
