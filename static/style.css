@@ -45,7 +45,6 @@ body {
     height: 100vh;
     font-family: var(--body-font);
     color: var(--text-primary);
-    background: linear-gradient(135deg, #2a1f3d 0%, #5a2584 50%, #3d2b5e 100%);
     overflow: hidden;
 }
 
@@ -57,6 +56,31 @@ body {
     height: 100%;
     z-index: -1;
     pointer-events: none;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(138, 43, 226, 0.8) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(75, 0, 130, 0.6) 0%, transparent 40%),
+        radial-gradient(circle at 40% 70%, rgba(72, 61, 139, 0.7) 0%, transparent 30%),
+        radial-gradient(circle at 70% 30%, rgba(106, 90, 205, 0.5) 0%, transparent 35%),
+
+        linear-gradient(135deg,
+            #2d1b4e 0%,
+            #4a2c5a 25%,
+            #5d4371 50%,
+            #3d2a52 75%,
+            #2a1e3f 100%
+        );
+
+    animation: background-pulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes background-pulse {
+    0% {
+        filter: brightness(1) contrast(1);
+    }
+
+    100% {
+        filter: brightness(1.1) contrast(1.05);
+    }
 }
 
 #audio-waves-background canvas {
@@ -80,7 +104,6 @@ body {
     z-index: 1;
 }
 
-/* Header Styles */
 .main-header {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -159,7 +182,6 @@ body {
     letter-spacing: 1px;
 }
 
-/* Content Layout */
 .content-wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -184,7 +206,6 @@ body {
     grid-area: output;
 }
 
-/* Card Styles */
 .input-card,
 .settings-card,
 .output-card {
@@ -239,7 +260,6 @@ body {
     min-height: 0;
 }
 
-/* Input Styles */
 .input-group {
     margin-bottom: 1rem;
     display: flex;
@@ -334,7 +354,6 @@ body {
     font-weight: 600;
 }
 
-/* Settings Grid */
 .settings-grid {
     display: flex;
     flex-direction: column;
@@ -342,7 +361,6 @@ body {
     flex: 1;
 }
 
-/* Custom Select */
 .custom-select {
     position: relative;
 }
@@ -456,7 +474,6 @@ body {
     font-size: 0.8rem;
 }
 
-/* Range Slider */
 .range-slider {
     position: relative;
     display: flex;
@@ -516,7 +533,6 @@ small {
     font-style: italic;
 }
 
-/* Buttons */
 .generate-button {
     width: 100%;
     padding: 0.8rem 1.5rem;
@@ -604,7 +620,6 @@ small {
     }
 }
 
-/* Audio Section */
 .audio-section {
     flex: 1;
     display: flex;
@@ -744,12 +759,10 @@ small {
     background: linear-gradient(45deg, var(--accent-purple), var(--secondary-medium));
 }
 
-/* Utility Classes */
 .hidden {
     display: none !important;
 }
 
-/* Loading States */
 .loading .audio-placeholder {
     color: var(--accent-gold);
 }
@@ -766,7 +779,6 @@ small {
     background: linear-gradient(to top, var(--error-color), #ff8080);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .main-container {
         padding: 0.8rem;
