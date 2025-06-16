@@ -24,11 +24,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentAudioData = null;
 
-    // Character counter
+    // Function to check if the generate button should be enabled or disabled
+    function toggleGenerateButton() {
+        const text = textInput.value.trim();
+        generateBtn.disabled = text.length === 0;
+    }
+
+    // Disable the button by default when the page loads
+    generateBtn.disabled = true;
+
+    // Character counter and button validation
     textInput.addEventListener('input', function() {
         const length = this.value.length;
         charCount.textContent = length;
         
+        // Update counter colors
         if (length > 2500) {
             charCount.style.color = '#ff5e5e';
         } else if (length > 2000) {
@@ -36,6 +46,20 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             charCount.style.color = '#f4b942';
         }
+
+        // Check if the button should be enabled/disabled
+        toggleGenerateButton();
+    });
+
+    // Also check when content changes by other methods (paste, cut, etc.)
+    textInput.addEventListener('paste', function() {
+        // Use setTimeout so the paste event completes before checking
+        setTimeout(toggleGenerateButton, 10);
+    });
+
+    textInput.addEventListener('cut', function() {
+        // Use setTimeout so the cut event completes before checking
+        setTimeout(toggleGenerateButton, 10);
     });
 
     // Custom select functionality
@@ -111,7 +135,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             btnText.classList.remove('hidden');
             loadingDots.classList.add('hidden');
-            audioPlaceholder.classList.remove('loading');
+            
+            // Re-check button state after loading
+            toggleGenerateButton();
         }
     }
 
